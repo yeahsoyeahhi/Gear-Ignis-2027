@@ -32,7 +32,7 @@ import pedroPathing.PPConstants.LConstants;
 /**
  *
 */
-@Autonomous(name="Red Observation Autonomous", group="Examples")
+@Autonomous(name="Observation Autonomous", group="!FTC")
 public class TalosObservationAutonomous extends OpMode {
     /** We create a Follower object from PedroPathing*/
     private Follower follower;

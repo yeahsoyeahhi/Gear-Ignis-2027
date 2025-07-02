@@ -32,7 +32,7 @@ import pedroPathing.actuators.Servos;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Red Basket Autonomous Reversed", group = "Examples")
+@Autonomous(name = "Basket    Autonomous", group = "!FTC")
 public class TalosBasketAutonomousReversed extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;

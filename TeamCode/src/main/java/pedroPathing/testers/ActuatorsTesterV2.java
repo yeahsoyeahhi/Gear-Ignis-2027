@@ -1,6 +1,7 @@
 package pedroPathing.testers;
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import pedroPathing.actuators.*;
 import pedroPathing.gamepad.GamepadButtonHandler;
 
 @TeleOp(name = "Actuators Tester v3", group = "Test")
+@Disabled
 public class ActuatorsTesterV2 extends LinearOpMode {
     boolean hardware = true;
     final String ARM_CONFIGURATION    = "dc_arm";

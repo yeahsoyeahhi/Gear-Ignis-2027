@@ -35,7 +35,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 
 
-@TeleOp(name="TeleOp Basket", group="Robot")
+@TeleOp(name="Basket TeleOp", group="!FTC")
 //@Disabled
 public class TeleOpBasket extends LinearOpMode {
     /* Declare OpMode members. */

@@ -37,7 +37,7 @@ import pedroPathing.actuators.Arm;
  */
 
 
-@TeleOp(name="specimen teleop", group="Robot")
+@TeleOp(name="Specimen TeleOp", group="!FTC")
 //@Disabled
 public class SpecimenTeleOp extends LinearOpMode {
     /* Declare OpMode members. */
