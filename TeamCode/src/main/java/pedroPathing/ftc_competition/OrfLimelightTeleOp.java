@@ -36,7 +36,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
  * We "took inspiration" (copy-pasted) the drive code from this GM0 page
  */
 
-@TeleOp(name="Limelight_Basket_TeleOp", group="!FTC")
+@TeleOp(name="ORF_Limelight_Basket_TeleOp", group="!FTC")
 //@Disabled
 public class LimelightTeleOpBasket extends LinearOpMode {
     /* Declare OpMode members. */
