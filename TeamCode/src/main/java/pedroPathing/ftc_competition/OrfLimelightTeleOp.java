@@ -454,15 +454,15 @@ public void initializeLimelight() {
     /* This is a limelight-guided sample alignment collection process*/
     public void limelightSampleAlign() {
         // Reset timer and PID state
-        double integral = 0, lastError = 0, offset =12;
+        double integral = 0, lastError = 0, x_offset =12, y_offset =15;
 
             LLResult result = limelight.getLatestResult();
             if (result != null && result.isValid()) {
-                double tx = result.getTx();  // horizontal angle to yellow sample
-                double ty = result.getTy();  // horizontal angle to yellow sample
+                double tx = result.getTx(); // How far left or right the target is (degrees)
+                double ty = result.getTy(); // How far up or down the target is (degrees)
 
                 // PID loop for steer adjustment
-                double error = tx-offset; // offset is the offset of robot's intake center from the limelight camera center
+                double error = tx-x_offset; // offset is the offset of robot's intake center from the limelight camera center
                 integral += error * getLoopDuration();  // simple integral
                 double derivative = (error - lastError) / getLoopDuration();
                 double turnPower = error*kP_TURN + integral*kI_TURN + derivative*kD_TURN;
@@ -475,7 +475,7 @@ public void initializeLimelight() {
                 drive(turnPower, strafePower);
 
                 // If within target thresholds, activate intake
-                if (Math.abs((tx-12)) < 2.0 && (Math.abs(ty+15)) < 1.5) { // substract offsets tx -12 ty +15
+                if (Math.abs((tx-x_offset)) < 2.0 && (Math.abs(ty+y_offset)) < 1.5) { // substract offsets tx -12 ty +15
                    armClearBarrier();
                    intakeOpen();
                    sleep(500);
@@ -485,7 +485,9 @@ public void initializeLimelight() {
                 }
 
                 telemetry.addData("tx", tx);
+                telemetry.addData("ty", ty);
                 telemetry.addData("turnPwr", turnPower);
+                telemetry.addData("strafePwr", strafePower);
                 telemetry.update();
 
             } else {
@@ -498,7 +500,7 @@ public void initializeLimelight() {
                 intakeOpen();
             }
         // Helper: drive robot with rotation & strafe (custom to your chassis)
-    public void drive(double turn, double strafe) {
+    void drive(double turn, double strafe) {
         // e.g. mecanum: set motor powers accordingly
             
             double denominator = Math.max(Math.abs(strafe) + Math.abs(turn), 1);
@@ -524,12 +526,12 @@ public void initializeLimelight() {
     }
     public void armScoreSpecimen() {
         wrist.setPosition(0);
-        armPosition = armDegreesToTicks(88); // 165
+        armPosition = armDegreesToTicks(88);
     }
     public void armScoreSampleInHigh() {
-        armPosition = armDegreesToTicks(110); // 110
+        armPosition = armDegreesToTicks(110);
         wrist.setPosition(0);
-    } // 90
+    } 
     public void armAttachHangingHook() {
         armPosition = armDegreesToTicks(120);
     }
