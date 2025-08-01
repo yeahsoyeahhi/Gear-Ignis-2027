@@ -68,14 +68,14 @@ public class TalosBasketAutonomousReversed extends OpMode {
     private final Pose scorePreloadControlPose = new Pose(26, 81, Math.toRadians(135));
 
     /** Lowest (First) Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(28, 116, Math.toRadians(0));
+    private final Pose pickup1Pose = new Pose(27.2, 116, Math.toRadians(0));
     private final Pose pickup1ControlPose = new Pose(10, 90, Math.toRadians(0));
     private final Pose scorePickup1ControlPose = new Pose(9, 101, Math.toRadians(0));
-    private final Pose scoreGrab1Pose = new Pose(22.8, 120.5, Math.toRadians(-45));
+    private final Pose scoreGrab1Pose = new Pose(22.8, 120, Math.toRadians(-45));
     private final Pose scorePickup2ControlPose = new Pose(30, 100, Math.toRadians(0));
 
     /** Middle (Second) Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(29.2, 124, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(28, 124, Math.toRadians(0));
     private final Pose pickup2ControlPose = new Pose(10, 90, Math.toRadians(0));
     private final Pose scoreGrab2Pose = new Pose(22.7, 126, Math.toRadians(-30));
 

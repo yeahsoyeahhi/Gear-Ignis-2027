@@ -456,6 +456,7 @@ public class TeleOpBasket extends LinearOpMode {
     }
     public void armWinchRobot() {
         armPosition = armDegreesToTicks(0);
+        wrist.setPosition(1);
     }
     public void configureFudge() {
             /* Here we create a "fudge factor" for the arm position.

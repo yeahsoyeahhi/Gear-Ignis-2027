@@ -37,7 +37,7 @@ import pedroPathing.actuators.Arm;
  */
 
 
-@TeleOp(name="Specimen TeleOp", group="!FTC")
+@TeleOp(name="Observation TeleOp", group="!FTC")
 //@Disabled
 public class SpecimenTeleOp extends LinearOpMode {
     /* Declare OpMode members. */
@@ -457,6 +457,7 @@ public class SpecimenTeleOp extends LinearOpMode {
     }
     public void armWinchRobot() {
         armPosition = armDegreesToTicks(0);
+        wrist.setPosition(1);
     }
     public void configureFudge() {
             /* Here we create a "fudge factor" for the arm position.
