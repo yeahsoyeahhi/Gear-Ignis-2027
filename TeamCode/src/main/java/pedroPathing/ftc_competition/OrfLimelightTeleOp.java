@@ -38,7 +38,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 
 @TeleOp(name="ORF_Limelight_Basket_TeleOp", group="!FTC")
 //@Disabled
-public class LimelightTeleOpBasket extends LinearOpMode {
+public class OrfLimelightTeleOp extends LinearOpMode {
     /* Declare OpMode members. */
     public DcMotor      leftFrontDrive; //the left front drivetrain motor
     public DcMotor      rightFrontDrive; //the right front drivetrain motor
@@ -68,7 +68,7 @@ public class LimelightTeleOpBasket extends LinearOpMode {
     final int MAX_VIPER_POSITION = viperMotorMmToTicks(480); // max viper extension (48 cm)
     final int MIN_VIPER_POSITION = 60; // min viper extension (60 ticks)
     int viperPosition; // store the current position of the viper motor in ticks
-    int viperPositionDelta;
+
     int armLiftComp = 0; // store the compensation factor for the arm lift
     IMU imu; // the IMU sensor object
     boolean wristVertical;
@@ -552,7 +552,7 @@ public void initializeLimelight() {
            /* Here we set the target position of our arm to match the variable that was selected
             by the driver. We add the armPosition Variable to our armPositionFudgeFactor, before adding
             our armLiftComp, which adjusts the arm height for different lift extensions.
-            We also set the target velocity (speed) the motor runs at, and use setMode to run it.*/
+            */
 
         armMotor.setTargetPosition(Math.max((armPosition+ armPositionFudgeFactor), minArmPos) + armLiftComp);
     }
@@ -590,7 +590,7 @@ public void initializeLimelight() {
         intake.setPosition(1);
     }
     public void wristVertical() {
-        wrist.setPosition(0); // 0.6
+        wrist.setPosition(0);
         wristVertical = true;
     }
     public void wristHorizontal() {
