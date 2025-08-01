@@ -179,22 +179,22 @@ public class OrfLimelightTeleOp extends LinearOpMode {
             else {
                 intakeCollect();
             }
-            /* Here we set the lift position based on the driver input.
-            This is a weird way to set the position of a "closed loop" device. The lift is run
+            /* Here we set the viper slide position based on the driver input.
+            This is a weird way to set the position of a "closed loop" device. The viper is run
             with encoders. So it knows exactly where it is, and there's a limit to how far in and
             out it should run. Normally, with mechanisms like this, we just tell it to run to an exact
             position. This works a lot like our arm. When we click a button, it moves to a position and then stops.
-            But the drivers wanted more "open loop" controls. So we want the lift to keep extending for
-            as long as we hold the bumpers, and when we let go of the bumper, stop where it is.
+            But the drivers wanted more "open loop" controls. So we want the viper to keep extending for
+            as long as we push y stick, and when we let go of the y stick, stop where it is.
             This allows the driver to manually set the position, and not have to have a bunch of different
             options for how far out it goes. But it also lets us enforce the end stops for the slide
             in software. So that the motor can't run past its endstops and stall.
-            We have our liftPosition variable, which we increment or decrement for every cycle (every
+            We have our viperPosition variable, which we increment or decrement for every cycle (every
             time our main robot code runs) that we're holding the button. Now since every cycle can take
             a different amount of time to complete, and we want the lift to move at a constant speed,
             we measure how long each cycle takes with the cycletime variable. Then multiply the
-            speed we want the lift to run at (in mm/sec) by the cycletime variable. There's no way
-            that our lift can move 2800mm in one cycle, but since each cycle is only a fraction of a second,
+            speed we want the viper to run at (in mm/s) by the cycletime variable. There's no way
+            that our viper can move 2800mm in one cycle, but since each cycle is only a fraction of a second,
             we are only incrementing it a small amount each cycle.
              */
             if (gamepad2.left_stick_y <= -.25){
@@ -372,10 +372,8 @@ public void initializeLimelight() {
         }
     
     public void output(){
-        telemetry.addData("Motor Current:",((DcMotorEx) leftBackDrive).getCurrent(CurrentUnit.AMPS));
-        /* send telemetry to the driver of the arm's current position and target position */
-        telemetry.addLine("Version: Android 5 orfanak");
-        telemetry.addData("armMotor Current:",((DcMotorEx) armMotor).getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("Back Left Motor Current:",((DcMotorEx) leftBackDrive).getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("armMotor Curreont:",((DcMotorEx) armMotor).getCurrent(CurrentUnit.AMPS));
         telemetry.addData("viperMotor Current:",((DcMotorEx) viperMotor).getCurrent(CurrentUnit.AMPS));
         telemetry.addData("arm target Position: ", armMotor.getTargetPosition());
         telemetry.addData("arm current position: ", armMotor.getCurrentPosition());
@@ -386,12 +384,12 @@ public void initializeLimelight() {
         telemetry.addData("cycle time sec",cycleTime);
         telemetry.addData("wrist pos", wrist.getPosition());
         telemetry.addData("intake pos", intake.getPosition());
-        telemetry.addData("X coordinate", pos.x);
-        telemetry.addData("Y coordinate", pos.y);
-        telemetry.addData("Heading angle otos radians", pos.h);
-        telemetry.addData("Heading angle imu", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
-        telemetry.addData("Heading angle otos degrees", Math.toDegrees(pos.h));
-        telemetry.addData("Heading angle imu degrees", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        telemetry.addData("X coordinate by OTOs", pos.x);
+        telemetry.addData("Y coordinate by OTOs", pos.y);
+        // telemetry.addData("Heading angle OTOS radians", pos.h);
+      //  telemetry.addData("Heading angle IMU radians", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        telemetry.addData("Heading angle OTOS degrees", Math.toDegrees(pos.h));
+        telemetry.addData("Heading angle OTOS degrees", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.update();
     }
 
@@ -456,7 +454,7 @@ public void initializeLimelight() {
     /* This is a limelight-guided sample alignment collection process*/
     public void limelightSampleAlign() {
         // Reset timer and PID state
-        double integral = 0, lastError = 0;
+        double integral = 0, lastError = 0, offset =12;
 
             LLResult result = limelight.getLatestResult();
             if (result != null && result.isValid()) {
@@ -464,7 +462,7 @@ public void initializeLimelight() {
                 double ty = result.getTy();  // horizontal angle to yellow sample
 
                 // PID loop for steer adjustment
-                double error = tx-12; // 12 is the offset of intake center from the limelight camera center
+                double error = tx-offset; // offset is the offset of robot's intake center from the limelight camera center
                 integral += error * getLoopDuration();  // simple integral
                 double derivative = (error - lastError) / getLoopDuration();
                 double turnPower = error*kP_TURN + integral*kI_TURN + derivative*kD_TURN;
@@ -500,12 +498,19 @@ public void initializeLimelight() {
                 intakeOpen();
             }
         // Helper: drive robot with rotation & strafe (custom to your chassis)
-    private void drive(double turn, double strafe) {
+    public void drive(double turn, double strafe) {
         // e.g. mecanum: set motor powers accordingly
-        leftFront.setPower(strafe + turn);
-        rightBack.setPower(strafe + turn);
-        rightFront.setPower(strafe - turn);
-        leftBack.setPower(strafe - turn);
+            
+            double denominator = Math.max(Math.abs(strafe) + Math.abs(turn), 1);
+            double frontLeftPower =  (strafe + turn) / denominator);
+            double backLeftPower =  (strafe - turn)/ denominator);
+            double frontRightPower = (strafe - turn) / denominator);
+            double backRightPower = (strafe + turn) / denominator;
+
+            leftFrontDrive.setPower(frontLeftPower);
+            leftBackDrive.setPower(backLeftPower);
+            rightFrontDrive.setPower(frontRightPower);
+            rightBackDrive.setPower(backRightPower);
 
     }
      // loop duration in seconds, assume ~30 Hz
