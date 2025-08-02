@@ -116,28 +116,27 @@ public class OrfLimelightTeleOp extends LinearOpMode {
         /* Runs continuously until the driver presses stop in the driver station */
         while (opModeIsActive())
         {
+             /* Gamepad 1 controls the robot's movement (strafing mode) and the positioning of the arm
+            for hanging at the end of the game.*/
             // driving in field-centric strafing mode
             straferMovement();
             // compensation factor in arm motor position
-//            setMinArmPos();
+            // setMinArmPos();
 
             // reading current position of the optical odometry sensor
             pos = otos.getPosition();
 
-
-            /* Gamepad 1 controls the robot's movement (strafing mode) and the positioning of the arm
-            for hanging at the end of the game.
-            Gamepad 2 controls all the arm positioning for scoring samples and specimens, and the Viper
+           /* Gamepad 2 controls all the arm positioning for scoring samples and specimens, and the Viper
             movement back and forth.
              */
 
             //  ---------------  Gamepad 2 Control --------------
             // Controlling wrist servo
             // wrist servo moves wrist to either horizontal or vertical position
-            if (gamepad2.dpad_down) {
+            if (gamepad2.dpad_up) {
                 wristVertical();
             }
-            else if (gamepad2.dpad_up){
+            else if (gamepad2.dpad_down){
                 // wrist horizontal
                 wristHorizontal();
             }
@@ -228,13 +227,11 @@ public class OrfLimelightTeleOp extends LinearOpMode {
             if (gamepad1.dpad_up){
                 /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
                 armAttachHangingHook();
-                // wristVertical();
             }
 
             else if (gamepad1.dpad_down){
                 /* this moves the arm down to lift the robot up once it has been hooked */
                 armWinchRobot();
-                //wristVertical();
             }
             if (gamepad1.a) {
                 wrist.setPosition(0);
@@ -595,13 +592,14 @@ public void initializeLimelight() {
     }
     public void intakeCollect() {
         intake.setPosition(1);
+        intakeOpened = false;
     }
     public void wristVertical() {
-        wrist.setPosition(0);
+        wrist.setPosition(1);
         wristVertical = true;
     }
     public void wristHorizontal() {
-        wrist.setPosition(1);
+        wrist.setPosition(0);
         wristVertical = false;
     }
 
@@ -654,9 +652,9 @@ public void initializeLimelight() {
          * viper slide is collapsed, the viper slide motor will stall. This piece of code runs the motor
          * in order to get stalled for 1 second. Then I reset the motor and I set the current position to 0
          */
-        viperMotor.setTargetPosition(viperMotorMmToTicks(-500));
+        viperMotor.setTargetPosition(viperMotorMmToTicks(-50));
         runViper();
-        sleep(1000);
+        sleep(500);
         viperMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         viperPosition = 0;
         setViperTargetPosition();
@@ -665,6 +663,26 @@ public void initializeLimelight() {
     public void runViper() {
         ((DcMotorEx) viperMotor).setVelocity(3000); //velocity of the viper slide in ticks/s
         viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    // viperGoTo is a more generalized function for viper slide to go to a certain mm opening
+    public void viperGoTo( int mm) {
+
+        viperPosition = viperMotorMmToTicks(mm);
+        viperMotor.setTargetPosition(viperPosition);
+        ((DcMotorEx) viperMotor).setVelocity(3000); //velocity of the viper slide in ticks/s
+        viperMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                /*here we check to see if the lift is trying to go higher than the maximum extension.
+           if it is, we set the variable to the max. */
+
+        if (viperPosition > MAX_VIPER_POSITION){
+            viperPosition = MAX_VIPER_POSITION;
+        }
+        // same as above, we see if the lift is trying to go below the minimum limit, and if it is, we set it to 0.
+        if (viperPosition < MIN_VIPER_POSITION) {
+            viperPosition = MIN_VIPER_POSITION;
+        }
     }
 
     //    ---------------- | strafer movement| --------------------------------------------------
