@@ -451,60 +451,61 @@ public void initializeLimelight() {
     /* This is a limelight-guided sample alignment collection process*/
     public void limelightSampleAlign() {
         // Reset timer and PID state
-        double integral = 0, lastError = 0, x_offset =12, y_offset =15;
+        double integral = 0, lastError = 0, x_offset = 12, y_offset = 15;
 
-            LLResult result = limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-                double tx = result.getTx(); // How far left or right the target is (degrees)
-                double ty = result.getTy(); // How far up or down the target is (degrees)
+        LLResult result = limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            double tx = result.getTx(); // How far left or right the target is (degrees)
+            double ty = result.getTy(); // How far up or down the target is (degrees)
 
-                // PID loop for steer adjustment
-                double error = tx-x_offset; // offset is the offset of robot's intake center from the limelight camera center
-                integral += error * getLoopDuration();  // simple integral
-                double derivative = (error - lastError) / getLoopDuration();
-                double turnPower = error*kP_TURN + integral*kI_TURN + derivative*kD_TURN;
-                lastError = error;
+            // PID loop for steer adjustment
+            double error = tx - x_offset; // offset is the offset of robot's intake center from the limelight camera center
+            integral += error * getLoopDuration();  // simple integral
+            double derivative = (error - lastError) / getLoopDuration();
+            double turnPower = error * kP_TURN + integral * kI_TURN + derivative * kD_TURN;
+            lastError = error;
 
-                // Strafe power based on lateral distance (ty), if needed:
-                double strafePower = ty * 0.02;  // tune constant
+            // Strafe power based on lateral distance (ty), if needed:
+            double strafePower = ty * 0.02;  // tune constant
 
-                  // Drive robot to align and strafe
-                drive(turnPower, strafePower);
+            // Drive robot to align and strafe
+            drive(turnPower, strafePower);
 
-                // If within target thresholds, activate intake
-                if (Math.abs((tx-x_offset)) < 2.0 && (Math.abs(ty+y_offset)) < 1.5) { // substract offsets tx -12 ty +15
-                   armClearBarrier();
-                   intakeOpen();
-                   sleep(500);
-                   intakeCollect();
-                } else {
-                    stopIntake();
-                }
-
-                telemetry.addData("tx", tx);
-                telemetry.addData("ty", ty);
-                telemetry.addData("turnPwr", turnPower);
-                telemetry.addData("strafePwr", strafePower);
-                telemetry.update();
-
+            // If within target thresholds, activate intake
+            if (Math.abs((tx - x_offset)) < 2.0 && (Math.abs(ty + y_offset)) < 1.5) { // substract offsets tx -12 ty +15
+                armClearBarrier();
+                intakeOpen();
+                sleep(500);
+                intakeCollect();
             } else {
-                // if no valid target, stop moving
-                drive(0, 0);
+//                stopIntake();
+            }
+
+            telemetry.addData("tx", tx);
+            telemetry.addData("ty", ty);
+            telemetry.addData("turnPwr", turnPower);
+            telemetry.addData("strafePwr", strafePower);
+            telemetry.update();
+
+        } else {
+            // if no valid target, stop moving
+            drive(0, 0);
                  /* This is the starting configuration of the robot. This turns off and opens fully the intake,and moves the arm
                 back to folded inside the robot. */
-                armCollapsed();
-                wristHorizontal();
-                intakeOpen();
-            }
+            armCollapsed();
+            wristHorizontal();
+            intakeOpen();
+        }
+    }
         // Helper: drive robot with rotation & strafe (custom to your chassis)
     void drive(double turn, double strafe) {
         // e.g. mecanum: set motor powers accordingly
             
             double denominator = Math.max(Math.abs(strafe) + Math.abs(turn), 1);
-            double frontLeftPower =  (strafe + turn) / denominator);
-            double backLeftPower =  (strafe - turn)/ denominator);
-            double frontRightPower = (strafe - turn) / denominator);
-            double backRightPower = (strafe + turn) / denominator;
+            double frontLeftPower =  ((strafe + turn) / denominator);
+            double backLeftPower =  ((strafe - turn)/ denominator);
+            double frontRightPower = ((strafe - turn) / denominator);
+            double backRightPower = ((strafe + turn) / denominator);
 
             leftFrontDrive.setPower(frontLeftPower);
             leftBackDrive.setPower(backLeftPower);
