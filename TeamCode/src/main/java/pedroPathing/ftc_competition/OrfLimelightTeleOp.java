@@ -38,7 +38,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 
 @TeleOp(name="Limelight_Basket_TeleOp", group="!FTC")
 //@Disabled
-public class OrfLimelightTeleOpBasket extends LinearOpMode {
+public class LimelightTeleOpBasket extends LinearOpMode {
     /* Declare OpMode members. */
     public DcMotor      leftFrontDrive; //the left front drivetrain motor
     public DcMotor      rightFrontDrive; //the right front drivetrain motor
