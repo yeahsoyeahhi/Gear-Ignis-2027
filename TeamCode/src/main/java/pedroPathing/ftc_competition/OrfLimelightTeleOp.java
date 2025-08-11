@@ -38,7 +38,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 
 @TeleOp(name="Limelight_Basket_TeleOp", group="!FTC")
 //@Disabled
-public class LimelightTeleOpBasket extends LinearOpMode {
+public class OrfLimelightTeleOp extends LinearOpMode {
     /* Declare OpMode members. */
     public DcMotor      leftFrontDrive; //the left front drivetrain motor
     public DcMotor      rightFrontDrive; //the right front drivetrain motor
@@ -77,6 +77,8 @@ public class LimelightTeleOpBasket extends LinearOpMode {
     double cycleTime = 0;
     double loopTime = 0;
     double oldTime = 0;
+    // limelight variables
+    double limelightIntegral = 0, limelightLastError = 0;
     //odometry sensor
     SparkFunOTOS.Pose2D pos;
     //Strafer speed compensation factor
@@ -96,7 +98,7 @@ public class LimelightTeleOpBasket extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
+        initializeIMU();
         // hardware initialization e.g., motors and sensors
         initializeIO();
         //optical odometry sensor initialization
@@ -361,7 +363,7 @@ public class LimelightTeleOpBasket extends LinearOpMode {
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward,
-imu.initialize(parameters);
+        imu.initialize(parameters);
 }
 
 public void initializeLimelight() {
@@ -456,22 +458,22 @@ public void initializeLimelight() {
     /* This is a limelight-guided sample alignment collection process*/
     public void limelightSampleAlign() {
         // Reset timer and PID state
-        double integral = 0, lastError = 0;
+
 
             LLResult result = limelight.getLatestResult();
             if (result != null && result.isValid()) {
                 double tx = result.getTx();  // horizontal angle to yellow sample
-                double ty = result.getTy();  // horizontal angle to yellow sample
+                double ty = result.getTy();  // vertical angle to yellow sample
 
                 // PID loop for steer adjustment
                 double error = tx-12; // 12 is the offset of intake center from the limelight camera center
-                integral += error * getLoopDuration();  // simple integral
-                double derivative = (error - lastError) / getLoopDuration();
-                double turnPower = error*kP_TURN + integral*kI_TURN + derivative*kD_TURN;
-                lastError = error;
+                limelightIntegral += error * getLoopDuration();  // simple limelightIntegral
+                double derivative = (error - limelightLastError) / getLoopDuration();
+                double turnPower = error*kP_TURN + limelightIntegral *kI_TURN + derivative*kD_TURN;
+                limelightLastError = error;
 
                 // Strafe power based on lateral distance (ty), if needed:
-                double strafePower = ty * 0.02;  // tune constant
+                double strafePower = ty * 0.00;  // tune constant
 
                   // Drive robot to align and strafe
                 drive(turnPower, strafePower);
@@ -483,12 +485,16 @@ public void initializeLimelight() {
                    sleep(500);
                    intakeCollect();
                 } else {
-                    stopIntake();
+                    intakeOpen();
                 }
 
                 telemetry.addData("tx", tx);
+                telemetry.addData("ty", ty);
+                telemetry.addData("error", error);
+                telemetry.addData("last error", limelightLastError);
+                telemetry.addData("strafePwr", strafePower);
                 telemetry.addData("turnPwr", turnPower);
-                telemetry.update();
+//                telemetry.update();
 
             } else {
                 // if no valid target, stop moving
@@ -499,13 +505,14 @@ public void initializeLimelight() {
                 wristHorizontal();
                 intakeOpen();
             }
+    }
         // Helper: drive robot with rotation & strafe (custom to your chassis)
     private void drive(double turn, double strafe) {
         // e.g. mecanum: set motor powers accordingly
-        leftFront.setPower(strafe + turn);
-        rightBack.setPower(strafe + turn);
-        rightFront.setPower(strafe - turn);
-        leftBack.setPower(strafe - turn);
+        leftFrontDrive.setPower(strafe + turn);
+        rightBackDrive.setPower(strafe + turn);
+        rightFrontDrive.setPower(strafe - turn);
+        leftBackDrive.setPower(strafe - turn);
 
     }
      // loop duration in seconds, assume ~30 Hz
@@ -662,6 +669,9 @@ public void initializeLimelight() {
 
     //    ---------------- | strafer movement| --------------------------------------------------
     public void straferMovement() {
+        if (gamepad2.dpad_right) {
+            return;
+        }
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
