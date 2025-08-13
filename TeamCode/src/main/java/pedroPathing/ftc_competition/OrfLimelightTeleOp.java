@@ -376,7 +376,6 @@ public void initializeLimelight() {
     public void output(){
         telemetry.addData("Motor Current:",((DcMotorEx) leftBackDrive).getCurrent(CurrentUnit.AMPS));
         /* send telemetry to the driver of the arm's current position and target position */
-        telemetry.addLine("Version: Android 5 orfanak");
         telemetry.addData("armMotor Current:",((DcMotorEx) armMotor).getCurrent(CurrentUnit.AMPS));
         telemetry.addData("viperMotor Current:",((DcMotorEx) viperMotor).getCurrent(CurrentUnit.AMPS));
         telemetry.addData("arm target Position: ", armMotor.getTargetPosition());
@@ -490,10 +489,10 @@ public void initializeLimelight() {
 
                 telemetry.addData("tx", tx);
                 telemetry.addData("ty", ty);
-                telemetry.addData("error", error);
-                telemetry.addData("last error", limelightLastError);
-                telemetry.addData("strafePwr", strafePower);
-                telemetry.addData("turnPwr", turnPower);
+                telemetry.addData("limelight_error", error);
+                telemetry.addData("limelight_last error", limelightLastError);
+                telemetry.addData("limelight_strafePwr", strafePower);
+                telemetry.addData("limelight_turnPwr", turnPower);
 //                telemetry.update();
 
             } else {
